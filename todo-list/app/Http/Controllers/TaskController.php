@@ -16,9 +16,36 @@ class TaskController extends Controller
         if(count(Task::where('user_id', $user_id)->get()) > 0){
             $tasks = Task::where([
                 'user_id' => $user_id,
-                'status' => true
+                'status' => true,
+                'completion_date' => null
             ])->get();
+            return response()->json(['data' => $tasks, 'status' => true], 200);
+        }else{
+            return response()->json(['data' => 'This user don\'t have tasks', 'status' => true], 200);
+        }
+    }
 
+    public function getDesativatedTasks(string $user_id)
+    {
+        //
+        if(count(Task::where('user_id', $user_id)->get()) > 0){
+            $tasks = Task::where([
+                'user_id' => $user_id,
+                'status' => false
+            ])->get();
+            return response()->json(['data' => $tasks, 'status' => true], 200);
+        }else{
+            return response()->json(['data' => 'This user don\'t have tasks', 'status' => true], 200);
+        }
+    }
+
+    public function getCompletedTasks(string $user_id)
+    {
+        if(count(Task::where('user_id', $user_id)->get()) > 0){
+            $tasks = Task::where([
+                'user_id' => $user_id,
+                'status' => true
+            ])->where('completion_date', '!=', null)->get();
             return response()->json(['data' => $tasks, 'status' => true], 200);
         }else{
             return response()->json(['data' => 'This user don\'t have tasks', 'status' => true], 200);
@@ -94,8 +121,28 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $task_id)
     {
         //
+        $task = Task::find($task_id);
+        if(is_null($task)){
+            return response()->json(['data' => 'Failed to delete task', 'status' => false], 500);
+        }else{
+            $task->delete();
+            return response()->json(['data' => 'Task deleted successfully', 'status' => true], 200);
+        }
     }
+
+    public function completeTask(string $task_id)
+    {
+        //
+        $task = Task::find($task_id);
+        if(is_null($task)){
+            return response()->json(['data' => 'Failed to complete task', 'status' => false], 500);
+        }else{
+            $task->update(['completion_date' => date('Y-m-d')]);
+            return response()->json(['data' => 'Task completed successfully', 'status' => true], 200);
+        }
+    }
+
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('priority');
             $table->boolean('status');
             $table->foreignId('user_id');
-            $table->date('completion_date');
+            $table->date('completion_date')->default(null);
             $table->timestamps();
         });
     }

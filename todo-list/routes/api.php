@@ -28,11 +28,16 @@ Route::delete('/user{id}', 'App\Http\Controllers\UserController@destroy');
 /************************** Routes Tasks **************************/
 
 Route::get('/task/{user_id}', 'App\Http\Controllers\TaskController@index');
+Route::get('/task/desativated_tasks/{user_id}', 'App\Http\Controllers\TaskController@getDesativatedTasks');
+Route::get('/task/completed_tasks/{user_id}', 'App\Http\Controllers\TaskController@getCompletedTasks');
 
 Route::post('/task', 'App\Http\Controllers\TaskController@store');
 Route::post('/task/show', 'App\Http\Controllers\TaskController@show');
 
 Route::put('/task/{task_id}', 'App\Http\Controllers\TaskController@update');
+Route::put('/task/complete_task/{task_id}', 'App\Http\Controllers\TaskController@completeTask');
+
+Route::delete('/task/{task_id}', 'App\Http\Controllers\TaskController@destroy');
 
 /************************** End Routes Tasks **************************/
 
