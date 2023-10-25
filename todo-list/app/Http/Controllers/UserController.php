@@ -42,7 +42,21 @@ class UserController extends Controller
     {
         //
         $data = $request->all();
-        return response()->json(['data' => $request, 'status' => true], 200);
+        if(isset($data['name']) && isset($data['email']) && isset($data['email'])){
+            
+            if(count(User::where('email', $data['email'])->get()) > 0){
+                return response()->json(['data' => 'Already exists an account with that email', 'status' => true], 200);
+            }else{
+                $user = User::create($data);
+                if($user){
+                    return response()->json(['data' => 'User added successfully', 'status' => true], 200);
+                }else{
+                    return response()->json(['data' => 'Failed to add User', 'status' => false], 500);
+                }
+            }
+        }else{
+            return response()->json(['data' => 'Invalid parameters', 'status' => false], 400);
+        }
     }
 
     /**
@@ -51,6 +65,12 @@ class UserController extends Controller
     public function show(string $id)
     {
         //
+        $user = User::find($id);
+        if(is_null($user)){
+            return response()->json(['data' => 'User don\'t exist', 'status' => true], 200);
+        }else{
+            return response()->json(['data' => $user, 'status' => true], 200);
+        }
     }
 
     /**
@@ -75,5 +95,12 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+        $user = User::find($id);
+        if(is_null($user)){
+            return response()->json(['data' => 'User don\'t exist', 'status' => true], 200);
+        }else{
+            $user->delete();
+            return response()->json(['data' => 'User deleted successfully', 'status' => true], 200);
+        }
     }
 }

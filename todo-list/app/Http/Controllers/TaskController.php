@@ -3,15 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Task;
 
 class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(string $user_id)
     {
         //
+        if(count(Task::where('user_id', $user_id)->get()) > 0){
+            $tasks = Task::where([
+                'user_id' => $user_id,
+                'status' => true
+            ])->get();
+
+            return response()->json(['data' => $tasks, 'status' => true], 200);
+        }else{
+            return response()->json(['data' => 'This user don\'t have tasks', 'status' => true], 200);
+        }
     }
 
     /**
@@ -28,14 +39,31 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         //
+        $data = $request->all();
+        $task = Task::create($data);
+        if($task){
+            return response()->json(['data' => 'Task added successfully', 'status' => true], 200);
+        }else{
+            return response()->json(['data' => 'Failed to add task', 'status' => false], 500);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
         //
+        $data = $request->all();
+        $task = Task::where([
+            'id' => $data['task_id'],
+            'user_id' => $data['user_id']
+        ])->get();
+        if(count($task) >= 1){
+            return response()->json(['data' => $task, 'status' => true], 200);
+        }else{
+            return response()->json(['data' => 'Error to find task', 'status' => false], 500);
+        }
     }
 
     /**
@@ -49,9 +77,18 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $task_id)
     {
         //
+        $data = $request->all();
+        $task = Task::find($task_id);
+        $task->update($data);  
+
+        if($task){
+            return response()->json(['data' => "Task updated successfully", 'status' => true], 200);
+        }else{
+            return response()->json(['data' => 'Failed to update task', 'status' => false], 500);
+        }
     }
 
     /**
